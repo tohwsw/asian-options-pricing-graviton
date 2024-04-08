@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pricing-amd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pricing-amd
+  template:
+    metadata:
+      labels:
+        app: pricing-amd
+    spec:
+      terminationGracePeriodSeconds: 0
+      nodeSelector:
+        node.kubernetes.io/instance-type: c7i.large
+      containers:
+        - name: pricing-amd
+          image: public.ecr.aws/j4m3t0a6/asianoptions:latest
+          resources:
+            requests:
+              cpu: 1.5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pricing-amd
+spec:
+  ports:
+    - name: http-port
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: pricing-amd
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pricing-amd
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: pricing-amd
+              port:
+                number: 8080

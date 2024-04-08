@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locust-amd
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: locust-amd
+  template:
+    metadata:
+      labels:
+        app: locust-amd
+    spec:
+      terminationGracePeriodSeconds: 0
+      nodeSelector:
+        kubernetes.io/arch: arm64
+      containers:
+        - name: locust-amd
+          image: 361185619080.dkr.ecr.ap-southeast-1.amazonaws.com/locust:latest
+          resources:
+            requests:
+              cpu: 1
+          args: ["-f", "/mnt/locust/locust.py", "--headless", "-u", "20", "-r", "20", "--host", "http://k8s-default-pricinga-97ace325d3-1847571606.ap-southeast-1.elb.amazonaws.com"]
