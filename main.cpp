@@ -60,9 +60,14 @@ int main(int argc, char **argv) {
 
   crow::SimpleApp app;
 
-  CROW_ROUTE(app, "/pricing")([](){
-      return "hello world";
-  });
+
+CROW_ROUTE(app,"/pricing")
+    ([&](){
+
+        return  std::to_string(discount_payoff_avg);
+
+    });
+
 
   app.port(8080).multithreaded().run();
 
